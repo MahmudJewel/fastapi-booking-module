@@ -11,21 +11,19 @@ from app.api.endpoints.booking import functions as booking_functions
 
 booking_module = APIRouter()
 
+# create new booking 
 @booking_module.post('/', response_model=Booking)
 async def create_new_booking(booking: BookingCreate, db: Session = Depends(get_db)):
-    # db_booking = booking_functions.get_user_by_email(db, user.email)
-    # if db_user:
-    #     raise HTTPException(status_code=400, detail="User already exists")
     new_booking = booking_functions.create_new_booking(db, booking)
     return new_booking
 
-# # get all user 
-# @user_module.get('/', 
-#             response_model=list[User],
-#             # dependencies=[Depends(RoleChecker(['admin']))]
-#             )
-# async def read_all_user( skip: int = 0, limit: int = 100,  db: Session = Depends(get_db)):
-#     return user_functions.read_all_user(db, skip, limit)
+# get all bookings 
+@booking_module.get('/', 
+            response_model=list[Booking],
+            # dependencies=[Depends(RoleChecker(['admin']))]
+            )
+async def read_all_booking( skip: int = 0, limit: int = 100,  db: Session = Depends(get_db)):
+    return booking_functions.read_all_booking(db, skip, limit)
 
 # # get user by id 
 # @user_module.get('/{user_id}', 
