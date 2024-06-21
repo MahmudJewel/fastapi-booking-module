@@ -5,8 +5,6 @@ from fastapi import FastAPI, Depends, Request
 from app.core.settings import config
 from app.core.modules import init_routers, make_middleware
 
-
-
 def create_app() -> FastAPI:
     app_ = FastAPI(
         title="Booking System.",
@@ -18,10 +16,7 @@ def create_app() -> FastAPI:
         middleware=make_middleware(),
     )
     init_routers(app_=app_)
-    # init_listeners(app_=app_)
-    # init_cache()
     return app_
-
 
 app = create_app()
 

@@ -21,11 +21,8 @@ def init_routers(app_: FastAPI) -> None:
     else:
     	admin.add_view(UserAdmin)
 
-
 origins = [
     "*",
-	# "http://localhost.tiangolo.com",
-	# "https://localhost.tiangolo.com",
 	# "http://localhost",
 	# "http://localhost:8080",
 ]
@@ -39,18 +36,6 @@ def make_middleware() -> List[Middleware]:
             allow_methods=["*"],
             allow_headers=["*"],
         ),
-        # Middleware(SQLAlchemyMiddleware),
     ]
     return middleware
 
-
-# def init_cache() -> None:
-#     Cache.init(backend=RedisBackend(), key_maker=CustomKeyMaker())
-
-# def init_listeners(app_: FastAPI) -> None:
-#     @app_.exception_handler(CustomException)
-#     async def custom_exception_handler(request: Request, exc: CustomException):
-#         return JSONResponse(
-#             status_code=exc.code,
-#             content={"error_code": exc.error_code, "message": exc.message},
-#         )
