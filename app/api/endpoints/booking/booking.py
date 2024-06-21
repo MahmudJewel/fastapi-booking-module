@@ -8,11 +8,15 @@ from sqlalchemy.orm import Session
 from app.core.dependencies import get_db, oauth2_scheme 
 from app.schemas.booking import Booking, BookingCreate #, UserUpdate
 from app.api.endpoints.booking import functions as booking_functions
+from app.core.rolechecker import RoleChecker
 
 booking_module = APIRouter()
 
 # create new booking 
-@booking_module.post('/', response_model=Booking)
+@booking_module.post('/', 
+                     response_model=Booking,
+                     # dependencies=[Depends(RoleChecker(['admin']))]
+                     )
 async def create_new_booking(booking: BookingCreate, db: Session = Depends(get_db)):
     new_booking = booking_functions.create_new_booking(db, booking)
     return new_booking
@@ -20,7 +24,7 @@ async def create_new_booking(booking: BookingCreate, db: Session = Depends(get_d
 # get all bookings 
 @booking_module.get('/', 
             response_model=list[Booking],
-            # dependencies=[Depends(RoleChecker(['admin']))]
+            dependencies=[Depends(RoleChecker(['admin', 'user']))]
             )
 async def read_all_booking( skip: int = 0, limit: int = 100,  db: Session = Depends(get_db)):
     return booking_functions.read_all_booking(db, skip, limit)
