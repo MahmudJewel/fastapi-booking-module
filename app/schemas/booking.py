@@ -10,7 +10,7 @@ class BookingBase(BaseModel):
 	# status: BookingStatus or None
 
 class BookingCreate(BookingBase):
-	user_id : str | None = None
+	pass
 
 class Booking(BaseModel):
 	id: str

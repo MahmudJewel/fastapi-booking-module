@@ -11,8 +11,10 @@ from jose import JWTError, jwt
 # import 
 from app.models import booking as BookingModel
 from app.schemas.booking import Booking, BookingCreate
+from app.schemas.user import User
 from app.core.settings import SECRET_KEY, ALGORITHM
 from app.core.dependencies import get_db, oauth2_scheme
+from app.api.endpoints.user import functions as user_functions
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -28,8 +30,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 #     return db_user
 
 # crete new booking
-def create_new_booking(db: Session, booking: BookingCreate):
-    new_booking = BookingModel.Booking(booking_date=booking.booking_date, description=booking.description, user_id=booking.user_id)
+def create_new_booking(db: Session, booking: BookingCreate, current_user: User):
+    new_booking = BookingModel.Booking(booking_date=booking.booking_date, description=booking.description, user_id=current_user.id)
     db.add(new_booking)
     db.commit()
     db.refresh(new_booking)

@@ -38,5 +38,7 @@ async def login_for_access_token(
 
 # get curren user 
 @auth_module.get('/users/me/', response_model= User)
-async def read_current_user( current_user: Annotated[User, Depends(user_functions.get_current_user)]):
+async def read_current_user( 
+    current_user: Annotated[User, Depends(user_functions.get_current_user)]
+    ):
     return current_user

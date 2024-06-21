@@ -9,16 +9,18 @@ from app.core.dependencies import get_db, oauth2_scheme
 from app.schemas.booking import Booking, BookingCreate #, UserUpdate
 from app.api.endpoints.booking import functions as booking_functions
 from app.core.rolechecker import RoleChecker
+from app.api.endpoints.user import functions as user_functions
+from app.schemas.user import User
 
 booking_module = APIRouter()
 
 # create new booking 
 @booking_module.post('/', 
                      response_model=Booking,
-                     # dependencies=[Depends(RoleChecker(['admin']))]
+                     dependencies=[Depends(RoleChecker(['user', 'admin']))]
                      )
-async def create_new_booking(booking: BookingCreate, db: Session = Depends(get_db)):
-    new_booking = booking_functions.create_new_booking(db, booking)
+async def create_new_booking(booking: BookingCreate, db: Session = Depends(get_db), current_user: User = Depends(user_functions.get_current_user)):
+    new_booking = booking_functions.create_new_booking(db, booking, current_user)
     return new_booking
 
 # get all bookings 
