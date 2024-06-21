@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, Enum
 from enum import Enum as PythonEnum
+from sqlalchemy.orm import relationship
 from app.core.database import Base
 from .common import CommonModel
 
@@ -15,6 +16,7 @@ class User(CommonModel):
 	first_name = Column(String(50), nullable=True)
 	last_name = Column(String(50), nullable=True)
 	role = Column(Enum(UserRole), default=UserRole.user)
+	booking = relationship("Booking", back_populates="user")
 
 	def __repr__(self):
 		return f"{self.email}"

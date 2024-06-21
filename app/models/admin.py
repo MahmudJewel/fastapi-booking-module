@@ -1,6 +1,6 @@
 from sqladmin import ModelView
 from app.models.user import User
-
+from app.models.booking import Booking
 
 class UserAdmin(ModelView, model=User):
     column_list = [
@@ -13,4 +13,16 @@ class UserAdmin(ModelView, model=User):
         User.role,
         User.created_at,
         User.updated_at,
+    ]
+
+class BookingAdmin(ModelView, model=Booking):
+    column_list = [
+        Booking.id,
+        Booking.booking_date,
+        Booking.description,
+        Booking.status,
+        Booking.user_id,
+        Booking.is_active,
+        Booking.created_at,
+        Booking.updated_at,
     ]
