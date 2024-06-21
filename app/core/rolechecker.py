@@ -12,5 +12,5 @@ class RoleChecker:
 	def __call__(self, user: User = Depends(UserFunctions.get_current_user)):
 		if user.role not in self.allowed_roles:
 			# logger.debug(f"User with role {user.role} not in {self.allowed_roles}")
-			raise HTTPException(status_code=403, detail="Operation not permitted")
+			raise HTTPException(status_code=403, detail="You are not allowed to access the API")
 

@@ -23,13 +23,21 @@ async def create_new_booking(booking: BookingCreate, db: Session = Depends(get_d
     new_booking = booking_functions.create_new_booking(db, booking, current_user)
     return new_booking
 
-# get all bookings 
+# get my booking list 
 @booking_module.get('/', 
             response_model=list[Booking],
             dependencies=[Depends(RoleChecker(['admin', 'user']))]
             )
+async def read_my_bookings( skip: int = 0, limit: int = 100,  db: Session = Depends(get_db), current_user: User = Depends(user_functions.get_current_user)):
+    return booking_functions.read_my_bookings(db, skip, limit, current_user)
+
+# get all booking list
+@booking_module.get('/all-booking/', 
+            response_model=list[Booking],
+            dependencies=[Depends(RoleChecker(['admin']))]
+            )
 async def read_all_booking( skip: int = 0, limit: int = 100,  db: Session = Depends(get_db)):
-    return booking_functions.read_all_booking(db, skip, limit)
+    return booking_functions.read_all_bookings(db, skip, limit)
 
 # # get user by id 
 # @user_module.get('/{user_id}', 

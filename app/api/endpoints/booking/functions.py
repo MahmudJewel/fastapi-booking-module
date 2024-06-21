@@ -38,9 +38,15 @@ def create_new_booking(db: Session, booking: BookingCreate, current_user: User):
     return new_booking
 
 
-# get all bookings 
-def read_all_booking(db: Session, skip: int, limit: int):
+# get my bookings 
+def read_my_bookings(db: Session, skip: int, limit: int, current_user:User):
+    return db.query(BookingModel.Booking).filter(BookingModel.Booking.user_id == current_user.id).offset(skip).limit(limit).all()
+
+# get my bookings 
+def read_all_bookings(db: Session, skip: int, limit: int):
     return db.query(BookingModel.Booking).offset(skip).limit(limit).all()
+
+
 
 # # update user
 # def update_user(db: Session, user_id: int, user: UserUpdate):
