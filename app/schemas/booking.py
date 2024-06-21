@@ -14,6 +14,9 @@ class BookingCreate(BookingBase):
 class BookingUpdate(BookingBase):
 	pass
 
+class BookingUpdateByAdmin(BookingBase):
+	status: BookingStatus or None
+	
 class Booking(BaseModel):
 	id: str
 	booking_date: datetime

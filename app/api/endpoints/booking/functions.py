@@ -10,7 +10,7 @@ from jose import JWTError, jwt
 
 # import 
 from app.models import booking as BookingModel
-from app.schemas.booking import Booking, BookingCreate, BookingUpdate
+from app.schemas.booking import Booking, BookingCreate, BookingUpdate, BookingUpdateByAdmin
 from app.schemas.user import User
 from app.core.settings import SECRET_KEY, ALGORITHM
 from app.core.dependencies import get_db, oauth2_scheme
@@ -51,13 +51,26 @@ def read_all_bookings(db: Session, skip: int, limit: int):
 # update my booking
 def update_my_booking(db: Session, booking_id: str, booking: BookingUpdate):
     db_booking = get_booking_by_id(db, booking_id)
-    updated_data = booking.model_dump(exclude_unset=True) # partial update
+    updated_data = booking.model_dump(exclude_unset=True) 
     for key, value in updated_data.items():
         setattr(db_booking, key, value)
     db.add(db_booking)
     db.commit()
     db.refresh(db_booking)
     return db_booking
+
+# update booking by admin
+def update_booking_by_admin(db: Session, booking_id: str, booking: BookingUpdateByAdmin):
+    db_booking = get_booking_by_id(db, booking_id)
+    updated_data = booking.model_dump(exclude_unset=True) 
+    for key, value in updated_data.items():
+        setattr(db_booking, key, value)
+    db.add(db_booking)
+    db.commit()
+    db.refresh(db_booking)
+    return db_booking
+
+
 
 # # delete user
 # def delete_user(db: Session, user_id: str):

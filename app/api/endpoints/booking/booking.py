@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 # import
 from app.core.dependencies import get_db, oauth2_scheme 
-from app.schemas.booking import Booking, BookingCreate, BookingUpdate
+from app.schemas.booking import Booking, BookingCreate, BookingUpdate, BookingUpdateByAdmin
 from app.api.endpoints.booking import functions as booking_functions
 from app.core.rolechecker import RoleChecker
 from app.api.endpoints.user import functions as user_functions
@@ -45,8 +45,16 @@ async def read_all_booking( skip: int = 0, limit: int = 100,  db: Session = Depe
               dependencies=[Depends(RoleChecker(['admin', 'user']))]
               )
 async def update_my_booking( booking_id: str, booking: BookingUpdate, db: Session = Depends(get_db)):
-    # print(f"Received data: {user.model_dump()}")
     return booking_functions.update_my_booking(db, booking_id, booking)
+
+# update booking by admin
+@booking_module.patch('/admin/{booking_id}', 
+              response_model=Booking,
+              dependencies=[Depends(RoleChecker(['admin']))]
+              )
+async def update_booking_by_admin( booking_id: str, booking: BookingUpdateByAdmin, db: Session = Depends(get_db)):
+    return booking_functions.update_booking_by_admin(db, booking_id, booking)
+
 
 # # delete user
 # @user_module.delete('/{user_id}', 
