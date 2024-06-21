@@ -10,7 +10,7 @@ from jose import JWTError, jwt
 
 # import 
 from app.models import booking as BookingModel
-from app.schemas.booking import Booking, BookingCreate
+from app.schemas.booking import Booking, BookingCreate, BookingUpdate
 from app.schemas.user import User
 from app.core.settings import SECRET_KEY, ALGORITHM
 from app.core.dependencies import get_db, oauth2_scheme
@@ -22,12 +22,12 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # def get_user_by_email(db: Session, email: str):
 #     return db.query(UserModel.User).filter(UserModel.User.email == email).first()
 
-# # get user by id
-# def get_user_by_id(db: Session, user_id: int):
-#     db_user = db.query(UserModel.User).filter(UserModel.User.id == user_id).first()
-#     if db_user is None:
-#         raise HTTPException(status_code=404, detail="User not found")
-#     return db_user
+# get booking by id
+def get_booking_by_id(db: Session, booking_id: str):
+    db_booking = db.query(BookingModel.Booking).filter(BookingModel.Booking.id == booking_id).first()
+    if db_booking is None:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    return db_booking
 
 # crete new booking
 def create_new_booking(db: Session, booking: BookingCreate, current_user: User):
@@ -48,16 +48,16 @@ def read_all_bookings(db: Session, skip: int, limit: int):
 
 
 
-# # update user
-# def update_user(db: Session, user_id: int, user: UserUpdate):
-#     db_user = get_user_by_id(db, user_id)
-#     updated_data = user.model_dump(exclude_unset=True) # partial update
-#     for key, value in updated_data.items():
-#         setattr(db_user, key, value)
-#     db.add(db_user)
-#     db.commit()
-#     db.refresh(db_user)
-#     return db_user
+# update my booking
+def update_my_booking(db: Session, booking_id: str, booking: BookingUpdate):
+    db_booking = get_booking_by_id(db, booking_id)
+    updated_data = booking.model_dump(exclude_unset=True) # partial update
+    for key, value in updated_data.items():
+        setattr(db_booking, key, value)
+    db.add(db_booking)
+    db.commit()
+    db.refresh(db_booking)
+    return db_booking
 
 # # delete user
 # def delete_user(db: Session, user_id: str):

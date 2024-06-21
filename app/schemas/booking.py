@@ -7,9 +7,11 @@ from .user import User
 class BookingBase(BaseModel):
 	booking_date: datetime
 	description: str or None = None
-	# status: BookingStatus or None
 
 class BookingCreate(BookingBase):
+	pass
+
+class BookingUpdate(BookingBase):
 	pass
 
 class Booking(BaseModel):
@@ -21,4 +23,7 @@ class Booking(BaseModel):
 	is_active: bool
 	created_at: datetime
 	updated_at: datetime
+
+
+
 
