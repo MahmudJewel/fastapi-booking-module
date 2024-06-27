@@ -55,15 +55,3 @@ async def update_my_booking( booking_id: str, booking: BookingUpdate, db: Sessio
 async def update_booking_by_admin( booking_id: str, booking: BookingUpdateByAdmin, db: Session = Depends(get_db)):
     return booking_functions.update_booking_by_admin(db, booking_id, booking)
 
-
-# # delete user
-# @user_module.delete('/{user_id}', 
-#             #    response_model=User,
-#             #    dependencies=[Depends(RoleChecker(['admin']))]
-#                )
-# async def delete_user( user_id: str, db: Session = Depends(get_db)):
-#     deleted_user = user_functions.delete_user(db, user_id)
-    
-#     return deleted_user
-
-

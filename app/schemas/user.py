@@ -11,6 +11,11 @@ class UserCreate(UserBase):
 	first_name: str or None = None
 	last_name: str or None = None
 
+class OAuthUserCreate(BaseModel):
+    email: str
+    first_name: str or None = None
+    last_name: str or None = None
+
 class UserLogin(UserBase):
 	password: str
 

@@ -10,7 +10,7 @@ from jose import JWTError, jwt
 
 # import 
 from app.models import user as UserModel
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreate, UserUpdate, OAuthUserCreate
 from app.core.settings import SECRET_KEY, ALGORITHM
 from app.core.dependencies import get_db, oauth2_scheme
 
@@ -36,6 +36,12 @@ def create_new_user(db: Session, user: UserCreate):
     db.refresh(new_user)
     return new_user
 
+def create_new_oauth_user(db: Session, email:str, first_name:str, last_name:str):
+    new_user = UserModel.User(email=email, first_name=first_name, last_name=last_name)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
 
 # get all user 
 def read_all_user(db: Session, skip: int, limit: int):
