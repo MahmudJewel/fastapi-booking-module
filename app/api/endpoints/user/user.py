@@ -1,5 +1,5 @@
 # fastapi 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 
 # import 
 from app.schemas.user import User, UserCreate, UserUpdate

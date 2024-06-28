@@ -1,25 +1,9 @@
 from fastapi import APIRouter
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
 from app.core.settings import MONGODB_URL
 from app.models import user as UserModel
 from app.models import booking as BookingModel
-
-# uri = MONGODB_URL
-# Create a new client and connect to the server
-# client = MongoClient(uri, server_api=ServerApi('1'))
-# db = client.ProductionKit
-# user_collection = db["users"]
-
-# # Send a ping to confirm a successful connection
-# try:
-#     client.admin.command('ping')
-#     print("You have successfully connected to MongoDB!")
-# except Exception as e:
-#     print(e)
-#     print("============> Please check your MongoDB connection.")
 
 db_module = APIRouter()
 async def init():
