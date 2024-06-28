@@ -1,56 +1,58 @@
 # fastapi 
 from fastapi import APIRouter, Depends, HTTPException
 
-# sqlalchemy
-from sqlalchemy.orm import Session
-
-# import
-from app.core.dependencies import get_db, oauth2_scheme 
+# import 
 from app.schemas.user import User, UserCreate, UserUpdate
 from app.api.endpoints.user import functions as user_functions
-from app.core.rolechecker import RoleChecker
+from app.models import user as UserModel
+
 user_module = APIRouter()
 
+# @user_module.get('/')
+# async def read_auth_page():
+#     return {"msg": "Auth page Initialization done"}
+
 @user_module.post('/', response_model=User)
-async def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = user_functions.get_user_by_email(db, user.email)
-    if db_user:
+async def create_new_user(user: UserCreate):
+    existing_user = await user_functions.get_user_by_email(user.email)
+    if existing_user:
         raise HTTPException(status_code=400, detail="User already exists")
-    new_user = user_functions.create_new_user(db, user)
+    
+    new_user = await user_functions.create_new_user(user)
     return new_user
 
 # get all user 
 @user_module.get('/', 
             response_model=list[User],
-            dependencies=[Depends(RoleChecker(['admin']))]
+            # dependencies=[Depends(RoleChecker(['admin']))]
             )
-async def read_all_user( skip: int = 0, limit: int = 100,  db: Session = Depends(get_db)):
-    return user_functions.read_all_user(db, skip, limit)
+async def read_all_user( skip: int = 0, limit: int = 100):
+    return await user_functions.read_all_user()
 
 # get user by id 
 @user_module.get('/{user_id}', 
             response_model=User,
-            dependencies=[Depends(RoleChecker(['admin']))]
+            # dependencies=[Depends(RoleChecker(['admin']))]
             )
-async def read_user_by_id( user_id: str, db: Session = Depends(get_db)):
-    return user_functions.get_user_by_id(db, user_id)
+async def read_user_by_id( user_id: str):
+    return await user_functions.get_user_by_id(user_id)
 
 # update user
 @user_module.patch('/{user_id}', 
               response_model=User,
-              dependencies=[Depends(RoleChecker(['admin']))]
+            #   dependencies=[Depends(RoleChecker(['admin']))]
               )
-async def update_user( user_id: str, user: UserUpdate, db: Session = Depends(get_db)):
+async def update_user( user_id: str, user: UserUpdate):
     print(f"Received data: {user.model_dump()}")
-    return user_functions.update_user(db, user_id, user)
+    return await user_functions.update_user(user_id, user)
 
 # delete user
 @user_module.delete('/{user_id}', 
-               dependencies=[Depends(RoleChecker(['admin']))]
+            #    response_model=User,
+            #    dependencies=[Depends(RoleChecker(['admin']))]
                )
-async def delete_user( user_id: str, db: Session = Depends(get_db)):
-    deleted_user = user_functions.delete_user(db, user_id)
-    
+async def delete_user( user_id: str):
+    deleted_user = await user_functions.delete_user(user_id)
     return deleted_user
 
 

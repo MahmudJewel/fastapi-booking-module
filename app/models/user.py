@@ -1,25 +1,20 @@
-from sqlalchemy import Column, String, Enum
 from enum import Enum as PythonEnum
-from sqlalchemy.orm import relationship
-from app.core.database import Base
+from typing import Optional
+from beanie import Document, Indexed
+from pydantic import Field
+from datetime import datetime
 from .common import CommonModel
 
 class UserRole(str, PythonEnum):
-	user = "user"
-	admin = "admin"
+    user = "user"
+    admin = "admin"
 
 class User(CommonModel):
-	__tablename__ = "users"
+    email: str = Field(max_length=50, unique=True)
+    password: str = Field(max_length=500)
+    first_name: Optional[str] = Field(max_length=50, default=None)
+    last_name: Optional[str] = Field(max_length=50, default=None)
+    role: UserRole = Field(default=UserRole.user)
 
-	email = Column(String(50), unique=True, index=True)
-	password = Column(String(50))
-	first_name = Column(String(50), nullable=True)
-	last_name = Column(String(50), nullable=True)
-	role = Column(Enum(UserRole), default=UserRole.user)
-	booking = relationship("Booking", back_populates="user")
-
-	def __repr__(self):
-		return f"{self.email}"
-	
-metadata = Base.metadata
-
+    class Settings:
+        collection = "users"

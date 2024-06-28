@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from app.api.endpoints.user.user import user_module
 from app.api.endpoints.user.auth import auth_module
-from app.api.endpoints.socialauth.google import social_auth_module
 
 user_router = APIRouter()
 
@@ -19,9 +18,3 @@ user_router.include_router(
     responses={404: {"description": "Not found"}},
 )
 
-user_router.include_router(
-    social_auth_module,
-    prefix="/auth",
-    tags=["social auth"],
-    responses={404: {"description": "Not found"}},
-)
