@@ -1,6 +1,6 @@
 from enum import Enum as PythonEnum
 from typing import Optional
-from beanie import Document, Indexed
+from beanie import Document, Indexed, Link
 from pydantic import Field
 from datetime import datetime
 from .common import CommonModel
@@ -15,6 +15,7 @@ class User(CommonModel):
     first_name: Optional[str] = Field(max_length=50, default=None)
     last_name: Optional[str] = Field(max_length=50, default=None)
     role: UserRole = Field(default=UserRole.user)
+    bookings: list[Link["Booking"]] = []
 
     class Settings:
         collection = "users"
