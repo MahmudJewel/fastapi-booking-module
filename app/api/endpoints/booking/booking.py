@@ -39,13 +39,7 @@
 # async def read_all_booking( skip: int = 0, limit: int = 100,  db: Session = Depends(get_db)):
 #     return booking_functions.read_all_bookings(db, skip, limit)
 
-# # update my booking
-# @booking_module.patch('/{booking_id}', 
-#               response_model=Booking,
-#               dependencies=[Depends(RoleChecker(['admin', 'user']))]
-#               )
-# async def update_my_booking( booking_id: str, booking: BookingUpdate, db: Session = Depends(get_db)):
-#     return booking_functions.update_my_booking(db, booking_id, booking)
+
 
 # # update booking by admin
 # @booking_module.patch('/admin/{booking_id}', 
@@ -71,7 +65,7 @@ booking_module = APIRouter()
 # get my booking list 
 @booking_module.get('/', 
             # response_model=list[Booking],
-            # dependencies=[Depends(RoleChecker(['admin', 'user']))]
+            dependencies=[Depends(RoleChecker(['admin', 'user']))]
             )
 async def read_my_bookings( skip: int = 0, limit: int = 100, current_user: User = Depends(user_functions.get_current_user)):
     return await booking_functions.read_my_bookings(skip, limit, current_user)
@@ -87,8 +81,15 @@ async def read_all_booking( skip: int = 0, limit: int = 100):
 # create new booking 
 @booking_module.post('/', 
                      response_model=Booking,
-                    #  dependencies=[Depends(RoleChecker(['user', 'admin']))]
                      )
 async def create_new_booking(booking: BookingCreate, current_user: User = Depends(user_functions.get_current_user)):
     new_booking = await booking_functions.create_new_booking(booking, current_user)
     return new_booking
+
+# update my booking
+@booking_module.patch('/{booking_id}', 
+            #   response_model=Booking,
+              dependencies=[Depends(RoleChecker(['admin', 'user']))]
+              )
+async def update_my_booking( booking_id: str, booking: BookingUpdate):
+    return await booking_functions.update_my_booking(booking_id, booking)
