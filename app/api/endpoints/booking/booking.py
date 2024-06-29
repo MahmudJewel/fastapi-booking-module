@@ -41,13 +41,7 @@
 
 
 
-# # update booking by admin
-# @booking_module.patch('/admin/{booking_id}', 
-#               response_model=Booking,
-#               dependencies=[Depends(RoleChecker(['admin']))]
-#               )
-# async def update_booking_by_admin( booking_id: str, booking: BookingUpdateByAdmin, db: Session = Depends(get_db)):
-#     return booking_functions.update_booking_by_admin(db, booking_id, booking)
+
 
 # fastapi 
 from fastapi import APIRouter, Depends, HTTPException
@@ -93,3 +87,12 @@ async def create_new_booking(booking: BookingCreate, current_user: User = Depend
               )
 async def update_my_booking( booking_id: str, booking: BookingUpdate):
     return await booking_functions.update_my_booking(booking_id, booking)
+
+# update booking by admin
+@booking_module.patch('/admin/{booking_id}', 
+            #   response_model=Booking,
+              dependencies=[Depends(RoleChecker(['admin']))]
+              )
+async def update_booking_by_admin( booking_id: str, booking: BookingUpdateByAdmin):
+    return await booking_functions.update_booking_by_admin(booking_id, booking)
+

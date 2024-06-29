@@ -56,25 +56,12 @@ async def update_my_booking(booking_id: str, booking: BookingUpdate):
     await db_booking.save()
     return db_booking
 
-# # update user
-# async def update_user(user_id: str, user: UserUpdate):
-#     db_user = await get_user_by_id(user_id)
-#     updated_data = user.model_dump(exclude_unset=True) # partial update
-#     for key, value in updated_data.items():
-#         setattr(db_user, key, value)
-#     await db_user.save()
-#     return db_user
-
-
-
-# # update booking by admin
-# def update_booking_by_admin(db: Session, booking_id: str, booking: BookingUpdateByAdmin):
-#     db_booking = get_booking_by_id(db, booking_id)
-#     updated_data = booking.model_dump(exclude_unset=True) 
-#     for key, value in updated_data.items():
-#         setattr(db_booking, key, value)
-#     db.add(db_booking)
-#     db.commit()
-#     db.refresh(db_booking)
-#     return db_booking
+# update booking by admin
+async def update_booking_by_admin(booking_id: str, booking: BookingUpdateByAdmin):
+    db_booking = await BookingModel.Booking.get(booking_id)
+    updated_data = booking.model_dump(exclude_unset=True) 
+    for key, value in updated_data.items():
+        setattr(db_booking, key, value)
+    await db_booking.save()
+    return db_booking
 
