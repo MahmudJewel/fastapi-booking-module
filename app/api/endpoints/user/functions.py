@@ -38,8 +38,8 @@ async def create_new_user(user: UserCreate):
 
 
 # get all user 
-async def read_all_user():
-    users = await UserModel.User.find_all().to_list()
+async def read_all_user(skip:int, limit:int):
+    users = await UserModel.User.all().skip(skip).limit(limit).to_list()
     return users
 
 # update user

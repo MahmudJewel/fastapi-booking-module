@@ -2,8 +2,6 @@ from fastapi import HTTPException, status, Depends
 from typing import Annotated
 from datetime import datetime, timedelta, timezone
 
-# from sqlalchemy.orm import Session
-
 # from auth import models, schemas
 from passlib.context import CryptContext
 from jose import JWTError, jwt
@@ -13,17 +11,9 @@ from app.models import booking as BookingModel
 from app.schemas.booking import Booking, BookingCreate, BookingUpdate, BookingUpdateByAdmin
 from app.schemas.user import User
 from app.core.settings import SECRET_KEY, ALGORITHM
-# from app.core.dependencies import get_db, oauth2_scheme
 from app.api.endpoints.user import functions as user_functions
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# # get booking by id
-# def get_booking_by_id( booking_id: str):
-#     db_booking = db.query(BookingModel.Booking).filter(BookingModel.Booking.id == booking_id).first()
-#     if db_booking is None:
-#         raise HTTPException(status_code=404, detail="Booking not found")
-#     return db_booking
 
 # crete new booking
 async def create_new_booking(booking: BookingCreate, current_user: User):
