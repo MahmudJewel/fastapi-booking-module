@@ -57,7 +57,7 @@
 
 # fastapi 
 from fastapi import APIRouter, Depends, HTTPException
-
+from typing import List
 # import
 # from app.core.dependencies import get_db, oauth2_scheme 
 from app.schemas.booking import Booking, BookingCreate, BookingUpdate, BookingUpdateByAdmin
@@ -70,10 +70,25 @@ booking_module = APIRouter()
 
 # get my booking list 
 @booking_module.get('/', 
-            response_model=list[Booking],
+            # response_model=list[Booking],
             # dependencies=[Depends(RoleChecker(['admin', 'user']))]
             )
 async def read_my_bookings( skip: int = 0, limit: int = 100, current_user: User = Depends(user_functions.get_current_user)):
     return await booking_functions.read_my_bookings(skip, limit, current_user)
 
+# get all booking list
+@booking_module.get('/all-booking/', 
+            # response_model=list[Booking],
+            # dependencies=[Depends(RoleChecker(['admin']))]
+            )
+async def read_all_booking( skip: int = 0, limit: int = 100):
+    return await booking_functions.read_all_bookings(skip, limit)
 
+# create new booking 
+@booking_module.post('/', 
+                     response_model=Booking,
+                    #  dependencies=[Depends(RoleChecker(['user', 'admin']))]
+                     )
+async def create_new_booking(booking: BookingCreate, current_user: User = Depends(user_functions.get_current_user)):
+    new_booking = await booking_functions.create_new_booking(booking, current_user)
+    return new_booking

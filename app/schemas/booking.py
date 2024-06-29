@@ -23,6 +23,7 @@ class Booking(BaseModel):
 	description: Optional[str]
 	status: Optional[str]
 	user: Optional[User]
+	# user: User
 	is_active: bool
 	created_at: datetime
 	updated_at: datetime

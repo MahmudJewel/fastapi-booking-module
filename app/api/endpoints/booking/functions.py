@@ -25,24 +25,25 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 #         raise HTTPException(status_code=404, detail="Booking not found")
 #     return db_booking
 
-# # crete new booking
-# def create_new_booking(db: Session, booking: BookingCreate, current_user: User):
-#     new_booking = BookingModel.Booking(booking_date=booking.booking_date, description=booking.description, user_id=current_user.id)
-#     db.add(new_booking)
-#     db.commit()
-#     db.refresh(new_booking)
-#     return new_booking
+# crete new booking
+async def create_new_booking(booking: BookingCreate, current_user: User):
+    loggedin_user= await user_functions.get_user_by_id(current_user.id)
+    new_booking = BookingModel.Booking(
+        booking_date=booking.booking_date, 
+        description=booking.description, 
+        user=loggedin_user)
+    await new_booking.insert()
+    return new_booking
 
-
-# get my bookings 
+# get my all bookings 
 async def read_my_bookings(skip: int, limit: int, current_user:User):
-    db_users = await BookingModel.Booking.find(BookingModel.Booking.user.id == current_user.id).to_list()
-    # return db.query(BookingModel.Booking).filter(BookingModel.Booking.user_id == current_user.id).offset(skip).limit(limit).all()
-    return db_users
+    my_bookings = await BookingModel.Booking.find(BookingModel.Booking.user.id==current_user.id, with_children=True).skip(skip).limit(limit).to_list()
+    return my_bookings
 
-# # get my bookings 
-# def read_all_bookings(db: Session, skip: int, limit: int):
-#     return db.query(BookingModel.Booking).offset(skip).limit(limit).all()
+# get all bookings 
+async def read_all_bookings(skip: int, limit: int):
+    bookings = await BookingModel.Booking.all().skip(skip).limit(limit).to_list()
+    return bookings
 
 
 
