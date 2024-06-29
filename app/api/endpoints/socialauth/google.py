@@ -7,11 +7,10 @@ from fastapi.security import OAuth2AuthorizationCodeBearer
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
-from sqlalchemy.orm import Session
-from app.core.dependencies import get_db, oauth2_scheme 
+# from app.core.dependencies import get_db, oauth2_scheme 
 from app.core.settings import REDIRECT_URI, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, ACCESS_TOKEN_EXPIRE_MINUTES
 from app.api.endpoints.user import functions as user_functions
-from app.schemas.user import OAuthUserCreate, Token
+from app.schemas.user import Token
 import os
 
 social_auth_module = APIRouter()
@@ -34,7 +33,7 @@ async def google_login():
     return {"authorization_url": authorization_url}
 
 @social_auth_module.get("/google/callback/")
-async def google_callback(request: FastAPIRequest, db: Session = Depends(get_db)):
+async def google_callback(request: FastAPIRequest):
     try:
         flow = Flow.from_client_config(
             {
@@ -57,12 +56,12 @@ async def google_callback(request: FastAPIRequest, db: Session = Depends(get_db)
         first_name = id_info.get("given_name")
         last_name = id_info.get("family_name")
         
-        user = user_functions.get_user_by_email(db, email)
+        user = await user_functions.get_user_by_email(email)
         if not user:
-            user = user_functions.create_new_oauth_user(db, email, first_name, last_name)
+            user = await user_functions.create_new_oauth_user(email, first_name, last_name)
         
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = user_functions.create_access_token(
+        access_token = await user_functions.create_access_token(
         data={"id": user.id, "email": user.email, "role": user.role}, expires_delta=access_token_expires
         )
         return Token(access_token=access_token, token_type="bearer")
