@@ -62,7 +62,7 @@ from typing import List
 # from app.core.dependencies import get_db, oauth2_scheme 
 from app.schemas.booking import Booking, BookingCreate, BookingUpdate, BookingUpdateByAdmin
 from app.api.endpoints.booking import functions as booking_functions
-# from app.core.rolechecker import RoleChecker
+from app.core.rolechecker import RoleChecker
 from app.api.endpoints.user import functions as user_functions
 from app.schemas.user import User
 
@@ -79,7 +79,7 @@ async def read_my_bookings( skip: int = 0, limit: int = 100, current_user: User 
 # get all booking list
 @booking_module.get('/all-booking/', 
             # response_model=list[Booking],
-            # dependencies=[Depends(RoleChecker(['admin']))]
+            dependencies=[Depends(RoleChecker(['admin']))]
             )
 async def read_all_booking( skip: int = 0, limit: int = 100):
     return await booking_functions.read_all_bookings(skip, limit)
