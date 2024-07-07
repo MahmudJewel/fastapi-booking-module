@@ -55,8 +55,6 @@ I have used Beanie ODM for MongoDB database model with FastAPI.
 
 ## Project Structure
 ```sh
-├── alembic     # Manages database migrations
-├── alembic.ini
 ├── app
 │   ├── api
 │   │   ├── endpoints   # Contains modules for each feature (user, product, payments).
