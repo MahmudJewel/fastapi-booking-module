@@ -21,7 +21,7 @@ user_router.include_router(
 
 user_router.include_router(
     social_auth_module,
-    prefix="/auth",
+    prefix="",
     tags=["social auth"],
     responses={404: {"description": "Not found"}},
 )

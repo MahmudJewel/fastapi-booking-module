@@ -3,13 +3,10 @@ from fastapi import FastAPI
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
+from starlette.middleware.sessions import SessionMiddleware
 
-# import 
-# from app.core.database import engine
-# from app.core.database import user_collection
-# from app.models.admin import UserAdmin
 from app.api.routers.api import router
-from app.core.settings import config
+from app.core.settings import config, SECRET_KEY
 
 def init_routers(app_: FastAPI) -> None:
     # url path 
@@ -22,6 +19,10 @@ origins = [
 
 def make_middleware() -> List[Middleware]:
     middleware = [
+        Middleware(
+            SessionMiddleware,
+            secret_key=SECRET_KEY
+        ),
         Middleware(
             CORSMiddleware,
             allow_origins=origins,

@@ -1,70 +1,101 @@
 # fastapi 
-from fastapi import APIRouter, Depends, HTTPException, status, Request as FastAPIRequest
-from typing import Annotated
+from fastapi import APIRouter, HTTPException
 from datetime import timedelta
 
-from fastapi.security import OAuth2AuthorizationCodeBearer
-from google.auth.transport.requests import Request as GoogleRequest
-from google.oauth2 import id_token
-from google_auth_oauthlib.flow import Flow
-# from app.core.dependencies import get_db, oauth2_scheme 
-from app.core.settings import REDIRECT_URI, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, ACCESS_TOKEN_EXPIRE_MINUTES
+# auth google 
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+from authlib.integrations.starlette_client import OAuth
+
+# import 
+from app.models import user as UserModel
 from app.api.endpoints.user import functions as user_functions
+from app.core.settings import (
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    REDIRECT_URI,
+    )
+from app.core.settings import (
+    REDIRECT_URI, 
+    GOOGLE_CLIENT_ID, 
+    GOOGLE_CLIENT_SECRET, 
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    REFRESH_TOKEN_EXPIRE_DAYS,
+    )
 from app.schemas.user import Token
-import os
 
 social_auth_module = APIRouter()
 
-@social_auth_module.get("/google")
-async def google_login():
-    flow = Flow.from_client_config(
-        {
-            "web": {
-                "client_id": GOOGLE_CLIENT_ID,
-                "client_secret": GOOGLE_CLIENT_SECRET,
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": [REDIRECT_URI],
-            }
-        },
-        scopes=['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
-    )
-    authorization_url, state = flow.authorization_url()
-    return {"authorization_url": authorization_url}
+# google ========================
+oauth = OAuth()
+oauth.register(
+    name='google',
+    client_id=GOOGLE_CLIENT_ID,
+    client_secret=GOOGLE_CLIENT_SECRET,
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+    authorize_params=None,
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    access_token_params=None,
+    refresh_token_url=None,
+    redirect_uri=REDIRECT_URI,
+    client_kwargs={'scope': 'openid profile email'},
+    jwks_uri='https://www.googleapis.com/oauth2/v3/certs',
+)
 
-@social_auth_module.get("/google/callback/")
-async def google_callback(request: FastAPIRequest):
-    try:
-        flow = Flow.from_client_config(
-            {
-                "web": {
-                    "client_id": GOOGLE_CLIENT_ID,
-                    "client_secret": GOOGLE_CLIENT_SECRET,
-                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                    "token_uri": "https://oauth2.googleapis.com/token",
-                    "redirect_uris": [REDIRECT_URI],
-                }
-            },
-            scopes=['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+# ============================> signin using google <========================
+@social_auth_module.get('/auth/google/')
+async def login(request: Request):
+    redirect_uri = request.url_for('auth_callback')
+    print(f"Redirect URI=========================>: {redirect_uri}")
+    response = await oauth.google.authorize_redirect(request, redirect_uri)
+    return response
+
+@social_auth_module.get('/social/auth/google/callback')
+async def auth_callback(request: Request):
+    token = await oauth.google.authorize_access_token(request)
+    # google = oauth.create_client('google')
+    # token = await google.authorize_access_token(request)
+    if 'id_token' not in token:
+        raise HTTPException(status_code=400, detail="Missing id_token in response")
+    # user = await oauth.google.parse_id_token(request, token)
+    # user_info = await oauth.google.parse_id_token(request, token)
+    # ===> no need to parse_id_token. starlet will do parse_id_token automatically. 
+    user_info = token['userinfo']
+    # Extract user information
+    email = user_info['email']
+    first_name = user_info.get('given_name')
+    last_name = user_info.get('family_name')
+    is_verified = user_info.get('email_verified', False)
+    print(f"user info ===================> {user_info}")
+    # Check if user already exists
+    user = await user_functions.get_user_by_email(email)
+    # user = db.query(UserModel.User).filter(UserModel.User.email == email).first()
+    if user is None:
+        # Create a new user
+        user = UserModel.User(
+            email=email,
+            first_name=first_name,
+            last_name=last_name
         )
-        flow.fetch_token(authorization_response=str(request.url))
-        
-        credentials = flow.credentials
-        id_info = id_token.verify_oauth2_token(credentials.id_token, GoogleRequest(), GOOGLE_CLIENT_ID)
-        
-        email = id_info.get("email")
-        first_name = id_info.get("given_name")
-        last_name = id_info.get("family_name")
-        
-        user = await user_functions.get_user_by_email(email)
-        if not user:
-            user = await user_functions.create_new_oauth_user(email, first_name, last_name)
-        
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = await user_functions.create_access_token(
-        data={"id": user.id, "email": user.email, "role": user.role}, expires_delta=access_token_expires
+        await user.insert()
+    else:
+        # Update existing user
+        user.first_name = first_name
+        user.last_name = last_name
+        await user.save()
+
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = await user_functions.create_access_token(
+    data={"id": user.id, "email": user.email, "role": user.role}, expires_delta=access_token_expires
         )
-        return Token(access_token=access_token, token_type="bearer")
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal server error")
+    
+    refresh_token_expires = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    refresh_token = await user_functions.create_refresh_token(
+        data={"id": user.id, "email": user.email, "role": user.role}, 
+        expires_delta=refresh_token_expires
+    )
+    return Token(access_token=access_token, refresh_token=refresh_token, token_type="bearer")
+
+# @auth_module.get('/protected')
+# async def protected(user: dict = Depends(oauth.google.authorize_user)):
+#     return {'message': 'This is a protected route', 'user': user}

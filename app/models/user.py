@@ -11,7 +11,7 @@ class UserRole(str, PythonEnum):
 
 class User(CommonModel):
     email: str = Field(max_length=50, unique=True)
-    password: str = Field(max_length=500)
+    password: Optional[str] = Field(max_length=500, default=None)
     first_name: Optional[str] = Field(max_length=50, default=None)
     last_name: Optional[str] = Field(max_length=50, default=None)
     role: UserRole = Field(default=UserRole.user)

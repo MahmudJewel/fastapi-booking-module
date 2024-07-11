@@ -5,12 +5,12 @@ python-jose
 python-multipart
 starlette
 uvicorn
-# pymongo[srv]
 pydantic_settings
 beanie
 motor
 python-dotenv
 passlib
-google-auth
-google-auth-httplib2
-google-auth-oauthlib
+httpx
+authlib
+itsdangerous
+
