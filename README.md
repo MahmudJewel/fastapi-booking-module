@@ -164,7 +164,8 @@ $ docker-compose up
     uvicorn
     python-jose
     python-dotenv
-    google-auth
+    authlib
+    httpx
 
 ### Happy Coding
 
