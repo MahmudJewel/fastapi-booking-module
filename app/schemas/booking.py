@@ -15,7 +15,9 @@ class BookingUpdate(BookingBase):
 	pass
 
 class BookingUpdateByAdmin(BookingBase):
-	status: BookingStatus or None
+	booking_date: datetime | None = None
+	description: str | None = None
+	status: BookingStatus | None = None
 	
 class Booking(BaseModel):
 	id: str
