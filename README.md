@@ -111,6 +111,7 @@ I have used Beanie ODM for MongoDB database model with FastAPI.
 
 
 # Setup
+## Using virtual environment
 1. The first thing to do is to clone the repository:
 ```sh
 $ https://github.com/MahmudJewel/fastapi-booking-module
@@ -136,6 +137,16 @@ session operates in a virtual environment set up by `virtualenv2`.
 (venv)$ uvicorn app.main:app --reload
 ```
 
+## Using Docker
+1. Rename **.env.example** to **.env** and give the information on the .env file.
+2. Open terminal from root directory (contains Dockerfile and docker-compose.yml) and run
+```sh
+# Build the Docker images
+$ docker-compose build
+
+# Run the Docker containers
+$ docker-compose up
+```
 
 # Tools
 ### Back-end
